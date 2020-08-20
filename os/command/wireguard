@@ -1,0 +1,121 @@
+Installation
+ Windows [7, 8, 8.1, 10, 2012, 2016, 2019]
+
+
+ Ubuntu [module & tools]
+$ sudo apt install wireguard
+
+
+ Android [play store & f-droid]
+
+Download from F-Droid
+
+ iOS [app store]
+
+ Debian [module & tools]
+# apt install wireguard
+
+Users with Debian releases older than Bullseye should enable backports.
+
+ Fedora [tools]
+ 
+$ sudo dnf install wireguard-tools
+ Mageia [tools]
+ 
+$ sudo urpmi wireguard-tools
+ Arch [module & tools]
+$ sudo pacman -S wireguard-tools
+Users of kernels < 5.6 may also choose wireguard-lts or wireguard-dkms+linux-headers, depending on which kernel is used.
+
+ OpenSUSE/SLE [tools]
+$ sudo zypper install wireguard-tools
+ Slackware [module & tools]
+$ for i in wireguard-linux-compat wireguard-tools; do wget https://slackbuilds.org/slackbuilds/14.2/network/$i.tar.gz && tar -xzf $i.tar.gz && cd $i && OUTPUT=$(pwd) ./$i.SlackBuild && sudo upgradepkg --install-new ./$i*.tgz && cd ..; done
+ Alpine [module & tools]
+# apk add -U wireguard-tools
+ Gentoo [module & tools]
+# emerge wireguard-tools
+The wireguard-modules ebuild also exists for compatibility with older kernels.
+
+Exherbo [module & tools]
+# cave resolve -x wireguard
+ NixOS [module & tools]
+boot.extraModulePackages = [ config.boot.kernelPackages.wireguard ];
+environment.systemPackages = [ pkgs.wireguard pkgs.wireguard-tools ];
+ Nix on Darwin [userspace go & tools]
+$ nix-env -iA nixpkgs.wireguard-tools
+OpenWRT [module & tools]
+# opkg install wireguard
+Further installation and configuration instructions may be found on the wiki.
+
+ Red Hat Enterprise Linux 8 [module-kmod, module-dkms, & tools]
+$ sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm https://www.elrepo.org/elrepo-release-8.el8.elrepo.noarch.rpm
+$ sudo yum install kmod-wireguard wireguard-tools
+Users running non-standard kernels may wish to use the DKMS package instead of the above prebuilt kmod package, using these alternative instructions:
+
+$ sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+$ sudo subscription-manager repos --enable codeready-builder-for-rhel-8-$(arch)-rpms
+$ sudo yum copr enable jdoss/wireguard
+$ sudo yum install wireguard-dkms wireguard-tools
+ CentOS 8 [module-kmod, module-dkms, & tools]
+$ sudo yum install elrepo-release epel-release
+$ sudo yum install kmod-wireguard wireguard-tools
+Users running non-standard kernels may wish to use the DKMS package instead of the above prebuilt kmod package, using these alternative instructions:
+
+$ sudo yum install epel-release
+$ sudo yum config-manager --set-enabled PowerTools
+$ sudo yum copr enable jdoss/wireguard
+$ sudo yum install wireguard-dkms wireguard-tools
+ Red Hat Enterprise Linux 7 [module-kmod, module-dkms, & tools]
+$ sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+$ sudo yum install kmod-wireguard wireguard-tools
+Users running non-standard kernels may wish to use the DKMS package instead of the above prebuilt kmod package, using these alternative instructions:
+
+$ sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+$ sudo curl -o /etc/yum.repos.d/jdoss-wireguard-epel-7.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+$ sudo yum install wireguard-dkms wireguard-tools
+ CentOS 7 [module, module-dkms, & tools]
+$ sudo yum install epel-release https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+$ sudo yum install yum-plugin-elrepo
+$ sudo yum install kmod-wireguard wireguard-tools
+Users running non-standard kernels may wish to use the DKMS package instead of the above prebuilt kmod package, using these alternative instructions:
+
+$ sudo yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+$ sudo curl -o /etc/yum.repos.d/jdoss-wireguard-epel-7.repo https://copr.fedorainfracloud.org/coprs/jdoss/wireguard/repo/epel-7/jdoss-wireguard-epel-7.repo
+$ sudo yum install wireguard-dkms wireguard-tools
+ FreeBSD [userspace go & tools]
+# pkg install wireguard
+OpenBSD ≥ 6.8 [tools]
+# pkg_add wireguard-tools
+OpenBSD ≤ 6.7 [userspace go & tools]
+# pkg_add wireguard-go wireguard-tools
+Termux [tools]
+# pkg install wireguard-tools
+Void [module & tools]
+# xbps-install -S wireguard-tools wireguard-dkms
+Adélie Linux [module & tools]
+# apk add wireguard-tools wireguard-module
+Source Mage [tools]
+# cast wireguard-tools
+Buildroot [module & tools]
+BR2_PACKAGE_WIREGUARD_LINUX_COMPAT=y
+BR2_PACKAGE_WIREGUARD_TOOLS=y
+EdgeOS [module & tools]
+$ sudo dpkg -i wireguard-{type}-{version}.deb
+First download the correct prebuilt file from the release page, and then install it with dpkg as above.
+
+LinuxKit [module]
+kernel:
+  linuxkit/kernel:...
+image:
+  linuxkit/ip:...
+AstLinux [module & tools]
+BR2_PACKAGE_WIREGUARD_TOOLS=y
+BR2_PACKAGE_WIREGUARD=y
+Milis [module & tools]
+# mps kur wireguard-tools wireguard-linux-compat
+ macOS Homebrew and MacPorts – Basic CLI [homebrew userspace go & homebrew tools] & [macports userspace go & macports tools]
+$ brew install wireguard-tools
+or
+
+$ port install wireguard-tools
