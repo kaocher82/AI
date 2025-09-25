@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agent Forge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #e5e7eb;
+        }
+        .glass-card {
+            background: rgba(31, 41, 55, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+            transform: translateY(-2px);
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #8b5cf6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Custom scrollbar for chat */
+        #chat-output::-webkit-scrollbar {
+            width: 8px;
+        }
+        #chat-output::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        #chat-output::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+            border-radius: 10px;
+            border: 2px solid #1f2937;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="container mx-auto max-w-4xl w-full">
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                AI Agent Forge
+            </h1>
+            <p class="text-gray-400 mt-2">Define a task, and I'll forge a specialized AI agent to handle it.</p>
+        </header>
+
+        <main>
+            <!-- Agent Creation Section -->
+            <div id="creation-section" class="glass-card p-6 shadow-2xl">
+                <h2 class="text-xl font-semibold mb-4">1. Define the New Agent's Task</h2>
+                <p class="text-gray-400 mb-4">Describe what you want your new AI agent to do. Be as specific as possible for the best results.</p>
+                <textarea id="task-input" class="w-full h-32 p-3 bg-gray-900/70 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none resize-none" placeholder="e.g., An AI that generates creative recipes based on ingredients I have at home."></textarea>
+                <button id="generate-btn" class="w-full mt-4 py-3 px-6 text-white font-semibold rounded-lg btn-primary flex items-center justify-center">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-2"></i>
+                    Forge Agent
+                </button>
+            </div>
+
+            <!-- Loading Indicator -->
+            <div id="loader" class="text-center p-8 my-6 hidden">
+                <div class="loader inline-block"></div>
+                <p class="mt-4 text-gray-400">Forging your new agent... This may take a moment.</p>
+            </div>
+            
+            <!-- Error Message Box -->
+            <div id="error-box" class="hidden my-6 bg-red-900/50 border border-red-500 text-red-300 px-4 py-3 rounded-lg" role="alert">
+                <strong class="font-bold">Error:</strong>
+                <span id="error-message" class="block sm:inline">Something went wrong.</span>
+            </div>
+
+            <!-- Generated Agent Section -->
+            <div id="agent-section" class="hidden my-6 glass-card p-6 shadow-2xl">
+                <h2 class="text-xl font-semibold mb-4 text-center">2. Your New AI Agent is Ready!</h2>
+                <div class="text-center border-b border-gray-700 pb-6 mb-6">
+                    <div id="agent-icon" class="text-6xl mb-4"></div>
+                    <h3 id="agent-name" class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500"></h3>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2"><i class="fa-solid fa-book-skull mr-2"></i>Core Directive</h4>
+                        <p id="agent-prompt" class="text-gray-400 text-sm bg-gray-900/70 p-3 rounded-lg"></p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-lg mb-2"><i class="fa-solid fa-bolt mr-2"></i>Key Skills</h4>
+                        <ul id="agent-skills" class="list-none space-y-2">
+                           <!-- Skills will be populated by JS -->
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interaction Section -->
+            <div id="interaction-section" class="hidden glass-card p-6 shadow-2xl">
+                <h2 class="text-xl font-semibold mb-4">3. Interact with Your Agent</h2>
+                <div id="chat-output" class="w-full h-64 p-4 bg-gray-900/70 border border-gray-600 rounded-lg overflow-y-auto mb-4">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="flex space-x-2">
+                    <input type="text" id="chat-input" class="flex-grow p-3 bg-gray-800/70 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none" placeholder="Talk to your new agent...">
+                    <button id="send-btn" class="py-3 px-5 text-white font-semibold rounded-lg btn-primary">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const generateBtn = document.getElementById('generate-btn');
+        const taskInput = document.getElementById('task-input');
+        const loader = document.getElementById('loader');
+        const errorBox = document.getElementById('error-box');
+        const errorMessage = document.getElementById('error-message');
+        
+        const creationSection = document.getElementById('creation-section');
+        const agentSection = document.getElementById('agent-section');
+        const interactionSection = document.getElementById('interaction-section');
+
+        const agentIcon = document.getElementById('agent-icon');
+        const agentName = document.getElementById('agent-name');
+        const agentPrompt = document.getElementById('agent-prompt');
+        const agentSkills = document.getElementById('agent-skills');
+
+        const chatOutput = document.getElementById('chat-output');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        
+        let generatedAgentSystemPrompt = '';
+
+        // Gemini API configuration
+        const API_KEY = ""; // Use "" for free tier on platforms like Canvas
+        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+        
+        const showLoader = (isLoading) => {
+            loader.style.display = isLoading ? 'block' : 'none';
+        };
+
+        const showError = (message) => {
+            errorMessage.textContent = message;
+            errorBox.style.display = 'block';
+        };
+        
+        const hideError = () => {
+            errorBox.style.display = 'none';
+        };
+        
+        // Function to make API calls with exponential backoff
+        async function fetchWithBackoff(url, payload, retries = 3, delay = 1000) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload),
+                    });
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error.message || `HTTP error! status: ${response.status}`);
+                    }
+                    return await response.json();
+                } catch (error) {
+                    if (i === retries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+                }
+            }
+        }
+
+        const handleAgentGeneration = async () => {
+            const task = taskInput.value.trim();
+            if (!task) {
+                showError("Please define a task for your agent.");
+                return;
+            }
+            
+            hideError();
+            showLoader(true);
+            agentSection.classList.add('hidden');
+            interactionSection.classList.add('hidden');
+            generateBtn.disabled = true;
+
+            const systemInstruction = {
+                parts: [{ text: "You are a 'Meta-AI' that designs other AI agents. Given a user's task, create a profile for a new, specialized AI agent. Respond with only a valid JSON object. The JSON object should adhere to the provided schema." }]
+            };
+
+            const payload = {
+                contents: [{ parts: [{ text: `Task: ${task}` }] }],
+                systemInstruction,
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            agentName: { type: "STRING", description: "A creative, fitting name for the agent." },
+                            agentIcon: { type: "STRING", description: "A single emoji that represents the agent." },
+                            systemPrompt: { type: "STRING", description: "A detailed system prompt to guide the new agent's behavior and personality." },
+                            keySkills: { type: "ARRAY", items: { type: "STRING" }, description: "An array of 3-5 key skills or functions of the agent." }
+                        },
+                        required: ["agentName", "agentIcon", "systemPrompt", "keySkills"]
+                    }
+                }
+            };
+            
+            try {
+                const result = await fetchWithBackoff(API_URL, payload);
+                const candidate = result.candidates?.[0];
+                if (!candidate || !candidate.content?.parts?.[0]?.text) {
+                    throw new Error("Invalid response structure from the API.");
+                }
+
+                const agentData = JSON.parse(candidate.content.parts[0].text);
+                
+                // Populate agent details
+                agentIcon.textContent = agentData.agentIcon;
+                agentName.textContent = agentData.agentName;
+                agentPrompt.textContent = agentData.systemPrompt;
+                
+                // Store system prompt for chat
+                generatedAgentSystemPrompt = agentData.systemPrompt;
+                
+                // Populate skills
+                agentSkills.innerHTML = '';
+                agentData.keySkills.forEach(skill => {
+                    const li = document.createElement('li');
+                    li.className = 'bg-gray-800/70 p-2 rounded-md text-sm text-gray-300';
+                    li.innerHTML = `<i class="fa-solid fa-check text-purple-400 mr-2"></i> ${skill}`;
+                    agentSkills.appendChild(li);
+                });
+                
+                // Reveal the agent and interaction sections
+                agentSection.classList.remove('hidden');
+                interactionSection.classList.remove('hidden');
+                
+                // Add a welcome message from the new agent
+                appendMessage("Hello! I am " + agentData.agentName + ". How can I assist you today?", 'agent');
+                
+            } catch (error) {
+                console.error("Error generating agent:", error);
+                showError(error.message || "Failed to generate the AI agent. Please try again.");
+            } finally {
+                showLoader(false);
+                generateBtn.disabled = false;
+            }
+        };
+
+        const handleChatInteraction = async () => {
+            const userMessage = chatInput.value.trim();
+            if (!userMessage || !generatedAgentSystemPrompt) return;
+
+            appendMessage(userMessage, 'user');
+            chatInput.value = '';
+            sendBtn.disabled = true;
+            appendMessage('...', 'agent-loading'); // Typing indicator
+
+            const systemInstruction = {
+                parts: [{ text: generatedAgentSystemPrompt }]
+            };
+            const payload = {
+                contents: [{ parts: [{ text: userMessage }] }],
+                systemInstruction,
+            };
+
+            try {
+                const result = await fetchWithBackoff(API_URL, payload);
+                const agentResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                // Remove the loading indicator and add the real response
+                const loadingIndicator = document.querySelector('.agent-loading');
+                if(loadingIndicator) loadingIndicator.parentElement.remove();
+                
+                if (agentResponse) {
+                    appendMessage(agentResponse, 'agent');
+                } else {
+                    appendMessage("I'm sorry, I couldn't process that.", 'agent-error');
+                }
+            } catch (error) {
+                console.error("Error during chat:", error);
+                const loadingIndicator = document.querySelector('.agent-loading');
+                if(loadingIndicator) loadingIndicator.parentElement.remove();
+                appendMessage("Apologies, I encountered an error. Please try again.", 'agent-error');
+            } finally {
+                sendBtn.disabled = false;
+                chatInput.focus();
+            }
+        };
+        
+        function appendMessage(text, sender) {
+            const messageWrapper = document.createElement('div');
+            messageWrapper.className = `flex mb-3 ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
+
+            const messageElement = document.createElement('div');
+            messageElement.textContent = text;
+            
+            let baseClasses = 'max-w-xs md:max-w-md p-3 rounded-lg text-white';
+            if (sender === 'user') {
+                messageElement.className = `${baseClasses} bg-blue-600`;
+            } else if (sender === 'agent') {
+                messageElement.className = `${baseClasses} bg-gray-700`;
+            } else if (sender === 'agent-loading') {
+                messageElement.className = `${baseClasses} bg-gray-700 agent-loading animate-pulse`;
+            } else if (sender === 'agent-error') {
+                 messageElement.className = `${baseClasses} bg-red-800`;
+            }
+
+            messageWrapper.appendChild(messageElement);
+            chatOutput.appendChild(messageWrapper);
+            chatOutput.scrollTop = chatOutput.scrollHeight;
+        }
+
+        generateBtn.addEventListener('click', handleAgentGeneration);
+        sendBtn.addEventListener('click', handleChatInteraction);
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                handleChatInteraction();
+            }
+        });
+
+    </script>
+</body>
+</html>
