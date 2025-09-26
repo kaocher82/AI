@@ -27,6 +27,12 @@
             box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
             transform: translateY(-2px);
         }
+        .btn-primary:disabled {
+            background: #4b5563;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
         .loader {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #8b5cf6;
@@ -145,10 +151,23 @@
         const sendBtn = document.getElementById('send-btn');
         
         let generatedAgentSystemPrompt = '';
+        let apiKey = '';
 
-        // Gemini API configuration
-        const API_KEY = ""; // Use "" for free tier on platforms like Canvas
-        const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
+        // --- API Key Management ---
+        window.onload = () => {
+            apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                apiKey = prompt("Please enter your Google Gemini API Key:", "");
+                if (apiKey) {
+                    localStorage.setItem('gemini_api_key', apiKey);
+                }
+            }
+
+            if (!apiKey) {
+                showError("API Key is required to use the AI Agent Forge. Please reload and enter your key to continue.");
+                generateBtn.disabled = true;
+            }
+        };
         
         const showLoader = (isLoading) => {
             loader.style.display = isLoading ? 'block' : 'none';
@@ -190,12 +209,18 @@
                 showError("Please define a task for your agent.");
                 return;
             }
+            if (!apiKey) {
+                showError("API Key is not set. Please reload and enter your key.");
+                return;
+            }
             
             hideError();
             showLoader(true);
             agentSection.classList.add('hidden');
             interactionSection.classList.add('hidden');
             generateBtn.disabled = true;
+
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const systemInstruction = {
                 parts: [{ text: "You are a 'Meta-AI' that designs other AI agents. Given a user's task, create a profile for a new, specialized AI agent. Respond with only a valid JSON object. The JSON object should adhere to the provided schema." }]
@@ -270,6 +295,8 @@
             sendBtn.disabled = true;
             appendMessage('...', 'agent-loading'); // Typing indicator
 
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
             const systemInstruction = {
                 parts: [{ text: generatedAgentSystemPrompt }]
             };
@@ -336,3 +363,4 @@
     </script>
 </body>
 </html>
+
