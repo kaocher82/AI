@@ -58,6 +58,33 @@
             border: 2px solid #1f2937;
         }
     </style>
+    <style>
+    .button {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 10px;
+        background-color: #007bff; /* Blue */
+        color: white;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        border-radius: 5px;
+        border: none;
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: #0056b3;
+    }
+
+    .ai-button {
+        background-color: #28a745; /* Green */
+    }
+
+    .ai-button:hover {
+        background-color: #1e7e34;
+    }
+</style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-4">
     <div class="container mx-auto max-w-4xl w-full">
@@ -67,7 +94,8 @@
             </h1>
             <p class="text-gray-400 mt-2">Define a task, and I'll forge a specialized AI agent to handle it.</p>
         </header>
-
+<a href="https://github.com/new" class="button">Create Git Page</a>
+<a href="https://your-ai-page-builder-url.com" class="button ai-button">AI Page Builder</a>
         <main>
             <!-- Agent Creation Section -->
             <div id="creation-section" class="glass-card p-6 shadow-2xl">
